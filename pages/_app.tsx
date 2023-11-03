@@ -1,35 +1,50 @@
-import '../styles/globals.css';
-import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import type { AppProps } from 'next/app';
-import { configureChains, createConfig, WagmiConfig } from 'wagmi';
-import {
-  arbitrum,
-  goerli,
-  mainnet,
-  optimism,
-  polygon,
-  base,
-  zora,
-} from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
+import "../styles/globals.css";
+import "@rainbow-me/rainbowkit/styles.css";
+import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import type { AppProps } from "next/app";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import { Chain } from "wagmi";
+
+const bbtestnet = {
+  id: 12_263,
+  name: "Buildbear Testnet",
+  network: "bbtestnet",
+  nativeCurrency: {
+    decimals: 18,
+    name: "BB ETH",
+    symbol: "BBETH",
+  },
+  rpcUrls: {
+    public: { http: ["https://rpc.buildbear.io/awake-sly-moore-9489068e"] },
+    default: { http: ["https://rpc.buildbear.io/awake-sly-moore-9489068e"] },
+  },
+  blockExplorers: {
+    etherscan: {
+      name: "BBExplorer",
+      url: "https://explorer.buildbear.io/awake-sly-moore-9489068e",
+    },
+    default: {
+      name: "BBExplorer",
+      url: "https://explorer.buildbear.io/awake-sly-moore-9489068e",
+    },
+  },
+} as const satisfies Chain;
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
+  [bbtestnet],
   [
-    mainnet,
-    polygon,
-    optimism,
-    arbitrum,
-    base,
-    zora,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli] : []),
-  ],
-  [publicProvider()]
+    jsonRpcProvider({
+      rpc: (chain) => ({
+        http: `https://rpc.buildbear.io/awake-sly-moore-9489068e`,
+      }),
+    }),
+  ]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'RainbowKit App',
-  projectId: 'YOUR_PROJECT_ID',
+  appName: "RainbowKit App",
+  projectId: "YOUR_PROJECT_ID",
   chains,
 });
 
